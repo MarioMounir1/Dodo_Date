@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Little Question for You 💕</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cairo:wght@800;900&family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- Floating pastel background decorations -->
+  <div class="bg-floaters" aria-hidden="true" id="bgFloaters"></div>
+
+  <!-- Confetti canvas -->
+  <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+
+  <!-- Funny "مرفووووض" pop-up overlay when she tries to press No -->
+  <div class="reject-overlay" id="rejectOverlay" aria-hidden="true">
+    <div class="reject-word" id="rejectWord" dir="rtl">مرفووووض</div>
+  </div>
+
+  <!-- Sound toggle -->
+  <button class="sound-toggle" id="soundToggle" type="button" aria-label="Toggle cute sound effects"
+    title="Toggle cute sounds">
+    <span id="soundIcon">🔊</span>
+  </button>
+
+  <main class="app-shell">
+    <!-- Progress bar (visible during steps 3-6) -->
+    <div class="progress-wrap hidden" id="progressWrap">
+      <div class="progress-meta">
+        <span id="progressLabel">Step 1 of 4</span>
+        <span class="progress-hearts" id="progressHearts">💕</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <!-- SCREEN 1: THE ASK -->
+    <section class="card screen active" id="screen-ask" data-step="ask">
+      <div class="badge-pill">💌 Special Invitation</div>
+      <div class="mascot-frame">
+        <img src="assets/bear-ask.jpg" alt="Cute blushing bear holding a heart" class="mascot-img" id="askMascot"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+        <div class="mascot-fallback" style="display:none;">🧸💕</div>
+      </div>
+
+      <h1 class="title">
+        Will you go on a date with me, <span class="highlight-name" data-gf-name>Dodo</span>?
+      </h1>
+      <p class="subtitle" id="askSubtitle">
+        I promise good food, cute vibes, and my best company 🥺✨
+      </p>
+
+      <div class="ask-buttons" id="askButtons">
+        <button class="btn btn-yes" id="btnYes" type="button">
+          Yes! 💕
+        </button>
+        <button class="btn btn-no" id="btnNo" type="button">
+          No
+        </button>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: YAY CELEBRATION -->
+    <section class="card screen" id="screen-yay" data-step="yay">
+      <div class="badge-pill">🎉 She Said Yes!!</div>
+      <div class="mascot-frame celebrate">
+        <img src="assets/bear-yay.jpg" alt="Two happy kawaii bears celebrating" class="mascot-img"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+        <div class="mascot-fallback" style="display:none;">🧸🎉🧸</div>
+      </div>
+
+      <h1 class="title">YAAAY!! Best decision ever! 🥰</h1>
+      <p class="subtitle">
+        Now it's your turn, <span class="highlight-name" data-gf-name>Dodo</span>! Let's build your dream date step by
+        step 🎀
+      </p>
+
+      <button class="btn btn-primary btn-lg" id="btnStartPlan" type="button">
+        Let's Plan Our Date ✨
+      </button>
+    </section>
+
+    <!-- SCREEN 3: PICK DATE & TIME -->
+    <section class="card screen" id="screen-datetime" data-step="datetime">
+      <div class="step-header">
+        <span class="step-emoji">📅</span>
+        <h2 class="step-title">When are you free?</h2>
+        <p class="step-desc">Pick the day and vibe that works best for you</p>
+      </div>
+
+      <div class="quick-days" id="quickDays"></div>
+
+      <div class="input-group">
+        <label class="input-label" for="dateInput">Or pick any date on the calendar</label>
+        <input type="date" id="dateInput" class="cute-input" />
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">What time of day?</label>
+        <div class="time-grid" id="timeGrid"></div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-ghost" data-back="yay" type="button">← Back</button>
+        <button class="btn btn-primary" id="btnNextFromDate" type="button">Next: Food 🍣 →</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 4: PICK FOOD -->
+    <section class="card screen" id="screen-food" data-step="food">
+      <div class="step-header">
+        <span class="step-emoji">🍽️</span>
+        <h2 class="step-title">What are we eating?</h2>
+        <p class="step-desc">Pick what you're craving most (you can pick more than one!)</p>
+      </div>
+
+      <div class="option-grid" id="foodGrid"></div>
+
+      <div class="input-group compact">
+        <input type="text" id="customFood" class="cute-input"
+          placeholder="Or type a specific restaurant / craving... 🍜" maxlength="60" />
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-ghost" data-back="datetime" type="button">← Back</button>
+        <button class="btn btn-primary" id="btnNextFromFood" type="button">Next: Dessert 🍓 →</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 5: PICK DESSERT / DRINKS -->
+    <section class="card screen" id="screen-dessert" data-step="dessert">
+      <div class="step-header">
+        <span class="step-emoji">🧋</span>
+        <h2 class="step-title">Sweet treat or drinks?</h2>
+        <p class="step-desc">Because every good date needs dessert 💕</p>
+      </div>
+
+      <div class="option-grid" id="dessertGrid"></div>
+
+      <div class="input-group compact">
+        <input type="text" id="customDessert" class="cute-input" placeholder="Any special sweet craving? 🍰"
+          maxlength="60" />
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-ghost" data-back="food" type="button">← Back</button>
+        <button class="btn btn-primary" id="btnNextFromDessert" type="button">Next: Activity 🎀 →</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 6: PICK ACTIVITY -->
+    <section class="card screen" id="screen-activity" data-step="activity">
+      <div class="step-header">
+        <span class="step-emoji">🎀</span>
+        <h2 class="step-title">What should we do?</h2>
+        <p class="step-desc">Pick our date activity + leave a cute note if you want!</p>
+      </div>
+
+      <div class="option-grid" id="activityGrid"></div>
+
+      <div class="input-group compact">
+        <input type="text" id="specialNote" class="cute-input"
+          placeholder="Any special request or dress code? (optional) 💌" maxlength="90" />
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-ghost" data-back="dessert" type="button">← Back</button>
+        <button class="btn btn-primary" id="btnFinish" type="button">Get My Date Ticket 🎟️</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 7: FINAL DATE TICKET -->
+    <section class="card screen screen-ticket" id="screen-ticket" data-step="ticket">
+      <div class="badge-pill">🎟️ It's Official!</div>
+      <h2 class="ticket-heading">Our Official Date Ticket 💕</h2>
+      <p class="step-desc">Save it or send it to me so I can book everything!</p>
+
+      <div class="ticket-wrapper">
+        <div class="date-ticket" id="dateTicket">
+          <div class="ticket-top">
+            <div class="ticket-brand">
+              <span class="ticket-admit">ADMIT TWO</span>
+              <span class="ticket-couple" id="ticketCouple">Dodo & Me</span>
+            </div>
+            <div class="ticket-stamp">CONFIRMED 💕</div>
+          </div>
+
+          <div class="ticket-divider">
+            <span class="notch left"></span>
+            <span class="dashed-line"></span>
+            <span class="notch right"></span>
+          </div>
+
+          <div class="ticket-body">
+            <div class="ticket-row">
+              <span class="t-label">📅 Date & Time</span>
+              <span class="t-value" id="ticketDateTime">—</span>
+            </div>
+            <div class="ticket-row">
+              <span class="t-label">🍽️ Food</span>
+              <span class="t-value" id="ticketFood">—</span>
+            </div>
+            <div class="ticket-row">
+              <span class="t-label">🍓 Dessert</span>
+              <span class="t-value" id="ticketDessert">—</span>
+            </div>
+            <div class="ticket-row">
+              <span class="t-label">🎀 Activity</span>
+              <span class="t-value" id="ticketActivity">—</span>
+            </div>
+            <div class="ticket-row hidden" id="ticketNoteRow">
+              <span class="t-label">💌 Note</span>
+              <span class="t-value" id="ticketNote">—</span>
+            </div>
+          </div>
+
+          <div class="ticket-footer">
+            <div class="barcode" aria-hidden="true"></div>
+            <span class="ticket-serial" id="ticketSerial">LOVE-2026-001</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ticket-actions">
+        <button class="btn btn-whatsapp" id="btnWhatsApp" type="button">
+          💬 Send on WhatsApp
+        </button>
+        <button class="btn btn-primary" id="btnDownload" type="button">
+          📸 Download Ticket PNG
+        </button>
+        <div class="secondary-actions">
+          <button class="btn btn-soft" id="btnCopy" type="button">📋 Copy Picks</button>
+          <button class="btn btn-ghost" id="btnEdit" type="button">✏️ Change Picks</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
